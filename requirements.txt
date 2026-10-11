@@ -1,0 +1,12 @@
+# Core libraries (unpinned for now).
+# Once everything runs for all 3 of you, run `pip freeze` and pin versions
+# of these packages (e.g. torch==x.y.z) so everyone matches.
+torch
+torchvision
+numpy
+pandas
+matplotlib
+scikit-learn
+tqdm
+pillow
+seaborn
