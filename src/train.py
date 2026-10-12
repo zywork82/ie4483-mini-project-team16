@@ -50,15 +50,20 @@ def parse_args():
 
 
 def get_data(args):
-    """Use Person 1's get_loaders if it exists, else a plain ImageFolder fallback."""
+    """Use Eunice's get_loaders if data.py exists, else a plain ImageFolder fallback."""
     try:
         from data import get_loaders
-        train_loader, val_loader, _ = get_loaders(
-            args.data_dir, img_size=args.img_size, batch_size=args.batch_size,
-            augment=args.augment, subset=args.subset)
-        return train_loader, val_loader
     except ImportError:
+        get_loaders = None
         print("data.py not found: using plain ImageFolder fallback")
+
+    if get_loaders is not None:
+        val_n = max(args.subset // 4, 50) if args.subset else None
+        train_loader, val_loader, _ = get_loaders(
+            args.data_dir, batch_size=args.batch_size, img_size=args.img_size,
+            augment=args.augment, train_subset=args.subset, val_subset=val_n,
+            seed=args.seed)
+        return train_loader, val_loader
 
     from torch.utils.data import DataLoader, Subset
     from torchvision import datasets, transforms
