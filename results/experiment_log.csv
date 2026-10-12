@@ -1,0 +1,9 @@
+who,model,learning_rate,batch_size,epochs,img_size,augmentation,train_size,val_accuracy
+P2,resnet18,0.001,32,2,224,False,200,0.92
+P2,resnet18,0.001,32,5,224,False,2000,0.984
+P2,resnet18,0.01,32,5,224,False,2000,0.99
+P2,resnet18,0.0001,32,5,224,False,2000,0.964
+P2,resnet18,0.01,16,5,224,False,2000,0.99
+P2,resnet18,0.01,64,5,224,False,2000,0.986
+P2,resnet18,0.0001,32,15,224,False,2000,0.976
+P2,resnet18,0.001,32,15,224,False,2000,0.984
