@@ -12,6 +12,7 @@ the best checkpoint (by validation accuracy) plus a curves plot.
 import argparse
 import csv
 import random
+import time
 from pathlib import Path
 
 import matplotlib
@@ -26,6 +27,10 @@ from utils import get_device, get_num_workers, set_seed
 
 LOG_COLUMNS = ["who", "model", "learning_rate", "batch_size", "epochs",
                "img_size", "augmentation", "train_size", "val_accuracy"]
+
+# Timing goes in its own file so the shared experiment_log.csv keeps its agreed columns.
+TIMING_COLUMNS = ["run_name", "who", "model", "device", "train_size",
+                  "epochs_run", "total_seconds", "seconds_per_epoch"]
 
 
 def parse_args():
@@ -130,6 +135,17 @@ def append_log(row: dict, path="results/experiment_log.csv"):
         w.writerow(row)
 
 
+def append_timing(row: dict, path="results/timing_log.csv"):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    new_file = not path.exists()
+    with open(path, "a", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=TIMING_COLUMNS)
+        if new_file:
+            w.writeheader()
+        w.writerow(row)
+
+
 def save_curves(history, run_name):
     out = Path("results/curves")
     out.mkdir(parents=True, exist_ok=True)
@@ -176,8 +192,10 @@ def main():
     history = {"train_loss": [], "val_loss": [], "train_acc": [], "val_acc": []}
     best_acc, bad_epochs = 0.0, 0
     freeze_bn = not args.unfreeze
+    train_start = time.perf_counter()
 
     for epoch in range(1, args.epochs + 1):
+        epoch_start = time.perf_counter()
         tr_loss, tr_acc = run_epoch(model, train_loader, criterion, optimizer,
                                     device, True, freeze_bn)
         va_loss, va_acc = run_epoch(model, val_loader, criterion, optimizer,
@@ -185,7 +203,8 @@ def main():
         for k, v in zip(history, [tr_loss, va_loss, tr_acc, va_acc]):
             history[k].append(v)
         print(f"Epoch {epoch}/{args.epochs}  train loss {tr_loss:.4f} acc {tr_acc:.4f}"
-              f"  |  val loss {va_loss:.4f} acc {va_acc:.4f}")
+              f"  |  val loss {va_loss:.4f} acc {va_acc:.4f}"
+              f"  [{time.perf_counter() - epoch_start:.0f}s]")
 
         if va_acc > best_acc:
             best_acc, bad_epochs = va_acc, 0
@@ -204,6 +223,16 @@ def main():
         "train_size": len(train_loader.dataset),
         "val_accuracy": round(best_acc, 4),
     })
+    total_s = time.perf_counter() - train_start
+    epochs_run = len(history["val_acc"])
+    append_timing({
+        "run_name": run_name, "who": args.who, "model": args.model,
+        "device": str(device), "train_size": len(train_loader.dataset),
+        "epochs_run": epochs_run, "total_seconds": round(total_s, 1),
+        "seconds_per_epoch": round(total_s / epochs_run, 1),
+    })
+    print(f"Training time: {total_s:.0f}s total, {total_s / epochs_run:.0f}s per epoch "
+          f"({epochs_run} epochs, device {device})")
     print(f"Best val accuracy: {best_acc:.4f}  (checkpoint: {ckpt_dir / (run_name + '.pth')})")
 
 
