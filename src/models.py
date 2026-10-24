@@ -46,15 +46,15 @@ def build_model(name: str, num_classes: int = 2, pretrained: bool = True,
             _freeze(model)
         model.classifier[6] = nn.Linear(model.classifier[6].in_features, num_classes)
 
-    # ---- Person 3: add your small CNN here ----
+    
+        # ---Person 3: added small cnn ---
     elif name == "small_cnn":
-        raise NotImplementedError("Person 3 adds small_cnn here")
-
+        from small_cnn import SmallCNN
+        model = SmallCNN(num_classes=num_classes)  # trained from scratch, nothing frozen
     else:
         raise ValueError(f"Unknown model name: {name}")
 
     return model
-
 
 def unfreeze_last_block(model: nn.Module, name: str) -> None:
     """Fine-tuning option: also train the last convolutional block."""
