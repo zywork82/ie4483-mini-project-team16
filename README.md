@@ -8,7 +8,7 @@ Classify images as dog (1) or cat (0), then extend the approach to CIFAR-10
 
 | Member | Matric no. | Role |
 |---|---|---|
-| Lee Yu Ying, Eunice | [TODO] | Person 1: data, pre-processing, prediction |
+| Lee Yu Ying, Eunice | U2321640A | Person 1: data, pre-processing, prediction |
 | Quek Zhi Yu | U2321638H | Person 2: main model (ResNet-50) |
 | Sng Xiang Ling Chloe | U2320927G | Person 3: small CNN, CIFAR-10, class imbalance |
 
@@ -130,12 +130,18 @@ Evaluation transform: resize to 224, ImageNet normalisation.
 
 ### 4.2 Submission file
 
-[TODO: Eunice's predict command and text, once (d) and submission.csv are final.]
+Put the final checkpoint from the shared Google Drive in `checkpoints/`, then:
 
 ```bash
-python src/predict.py [TODO: arguments]
+python src/predict.py --ckpt checkpoints/resnet50_lr0.001_bs32_ep5_img224_noaug_s42.pth --check-val
 # writes results/submission.csv  (columns: id, label; 1 = dog, 0 = cat)
 ```
+
+This predicts all 500 test images with the final ResNet-50. `--check-val` first
+prints the validation accuracy (99.54 percent for this checkpoint). The script also
+writes `results/test_predictions_detail.csv` (p_cat, p_dog and confidence for each
+image) and, if `sampleSubmission.csv` is in the project folder, checks that the ids
+match it. The prediction files are also on the shared Google Drive under `results/`.
 
 ### 4.3 Small CNN (second model, for comparison)
 
