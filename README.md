@@ -6,12 +6,6 @@ Classify images as dog (1) or cat (0), then extend the approach to CIFAR-10
 
 **Team 16:**
 
-| Member | Matric no. | Role |
-|---|---|---|
-| Lee Yu Ying, Eunice | U2321640A | Person 1: data, pre-processing, prediction |
-| Quek Zhi Yu | U2321638H | Person 2: main model (ResNet-50) |
-| Sng Xiang Ling Chloe | U2320927G | Person 3: small CNN, CIFAR-10, class imbalance |
-
 ## 1. Setup
 
 Requires Python 3.10 or 3.11.
@@ -84,6 +78,8 @@ src/
   train.py              shared training script, logs to results/experiment_log.csv
   train_small_cnn.py    small CNN training script, one CSV per run
   predict.py            creates results/submission.csv
+  verify_checkpoint.py  checks a saved checkpoint's validation accuracy
+  run_all.ps1           runs the ResNet-18 / ResNet-50 / VGG16 tuning experiments (Windows)
   summarize_results.py  prints a table from results/experiment_log.csv
   utils.py              seed, device, helpers
 cifar10/
@@ -127,6 +123,23 @@ model.eval()
 ```
 
 Evaluation transform: resize to 224, ImageNet normalisation.
+
+To check a checkpoint's validation accuracy (about 99.5 percent for the final ResNet-50):
+
+```bash
+python src/verify_checkpoint.py --ckpt checkpoints/resnet50_lr0.001_bs32_ep5_img224_noaug_s42.pth
+```
+
+The tuning experiments (report Tables A1 and A2: learning rate, batch size,
+augmentation, unfreezing, full data) can be rerun on Windows from the project folder:
+
+```bash
+powershell -ExecutionPolicy Bypass -File src/run_all.ps1 -Tier 1
+```
+
+Tier 1 is the baseline with 3 seeds, Tier 2 learning rate and batch size, Tier 3
+augmentation and fine-tuning, Tier 4 full data (run it once with `-Models resnet18`
+and once with `-Models resnet50`). Add `-DryRun` to print the commands without running them.
 
 ### 4.2 Submission file
 
@@ -207,7 +220,7 @@ The 21 runs take about 20 minutes on Apple MPS. `summarise_imbalance.py` writes
 | Experiments | Hardware | PyTorch | Time |
 |---|---|---|---|
 | ResNet-50 / ResNet-18 / VGG16 (Dogs vs Cats) | NVIDIA RTX 4060 (CUDA 12.6) | 2.14.1+cu126 | about 180 s per epoch (ResNet-50, full data) |
-| Small CNN (Dogs vs Cats) | Mac, Apple MPS | 2.14.1 (Python 3.11.7) | about 220 s per epoch (full data) |
+| Small CNN (Dogs vs Cats) | Mac, Apple MPS | 2.14.1 (Python 3.11.7) | about 230 s per epoch (full data) |
 | CIFAR-10 and class imbalance | Mac, Apple MPS | 2.14.1 (Python 3.11.7) | about 8–9 s per epoch |
 
 - GPU and MPS training is not guaranteed to be fully deterministic, so small differences
@@ -225,6 +238,9 @@ All numbers are mean ± std over seeds 42, 43 and 44.
 | ResNet-18, pretrained, frozen | 1,026 / 11.2 M | 98.66 ± 0.02 |
 | Small CNN, from scratch | 355,778 / 355,778 | 83.6 ± 0.5 |
 
+On the 2,000-image subset (500 val images, seeds 42, 1 and 2): ResNet-50 99.2 ± 0.2,
+VGG16 99.1 ± 0.4, ResNet-18 98.4 ± 0.6, small CNN 69.0 ± 0.7.
+
 **CIFAR-10 (test, 10,000 images, small CNN from scratch)**
 
 Rare = bird, cat, deer. Common = the other 7 classes.
@@ -236,6 +252,8 @@ Rare = bird, cat, deer. Common = the other 7 classes.
 | Imbalanced, no fix | 32,890 | 63.4 ± 0.2 | 13.4 ± 0.7 | 84.8 ± 0.1 | 57.9 ± 0.4 |
 | Imbalanced, weighted loss | 32,890 | 65.8 ± 0.8 | 45.3 ± 3.7 | 74.6 ± 2.2 | 65.3 ± 0.7 |
 | Imbalanced, oversampling + augmentation | 32,890 | 65.5 ± 0.7 | 47.9 ± 5.2 | 73.0 ± 2.9 | 65.0 ± 0.7 |
+| Imbalanced, oversampling only (check) | 32,890 | 66.1 ± 0.5 | 36.1 ± 2.9 | 78.9 ± 0.8 | 64.5 ± 0.6 |
+| Imbalanced, augmentation only (check) | 32,890 | 59.4 ± 1.2 | 5.1 ± 1.5 | 82.7 ± 1.1 | 52.5 ± 1.3 |
 
 ## 7. Git workflow
 
