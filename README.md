@@ -6,13 +6,6 @@ Classify images as dog (1) or cat (0), then extend the approach to CIFAR-10
 
 **Team 16:**
 
-| Member | Matric no. | Role |
-|---|---|---|
-| Lee Yu Ying, Eunice | [TODO] | Person 1: data, pre-processing, prediction |
-| Quek Zhi Yu | U2321638H | Person 2: main model (ResNet-50) |
-| Sng Xiang Ling Chloe | U2320927G | Person 3: small CNN, CIFAR-10, class imbalance |
-
-## 1. Setup
 
 Requires Python 3.10 or 3.11.
 
