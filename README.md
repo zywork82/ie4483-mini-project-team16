@@ -254,10 +254,3 @@ Rare = bird, cat, deer. Common = the other 7 classes.
 | Imbalanced, oversampling + augmentation | 32,890 | 65.5 ± 0.7 | 47.9 ± 5.2 | 73.0 ± 2.9 | 65.0 ± 0.7 |
 | Imbalanced, oversampling only (check) | 32,890 | 66.1 ± 0.5 | 36.1 ± 2.9 | 78.9 ± 0.8 | 64.5 ± 0.6 |
 | Imbalanced, augmentation only (check) | 32,890 | 59.4 ± 1.2 | 5.1 ± 1.5 | 82.7 ± 1.1 | 52.5 ± 1.3 |
-
-## 7. Git workflow
-
-- Work on your own branch: `eunice` (Person 1, data), `zhiyu` (Person 2, main model), `chloe` (Person 3, CIFAR-10).
-- `git pull` before you start each day.
-- Open a pull request to merge into `main`.
-- Never commit the dataset, model files, or tokens.
