@@ -1,11 +1,11 @@
 <#
-Runs the Person 2 experiments in order and saves ALL console output to a log file.
-Put this file in the repo root. Run it from the repo root with the venv active.
+Runs the experiments in order and saves ALL console output to a log file.
+This script lives in src/. Run it from the repo root with the venv active.
 
-  powershell -ExecutionPolicy Bypass -File run_all.ps1 -Tier 1                  # 9 runs
-  powershell -ExecutionPolicy Bypass -File run_all.ps1 -Tier 2                  # 12 runs
-  powershell -ExecutionPolicy Bypass -File run_all.ps1 -Tier 3                  # 9 runs
-  powershell -ExecutionPolicy Bypass -File run_all.ps1 -Tier 4 -Models resnet18,resnet50   # 6 runs, FULL data
+  powershell -ExecutionPolicy Bypass -File src/run_all.ps1 -Tier 1                  # 9 runs
+  powershell -ExecutionPolicy Bypass -File src/run_all.ps1 -Tier 2                  # 12 runs
+  powershell -ExecutionPolicy Bypass -File src/run_all.ps1 -Tier 3                  # 9 runs
+  powershell -ExecutionPolicy Bypass -File src/run_all.ps1 -Tier 4 -Models resnet18,resnet50   # 6 runs, FULL data
 
   Add -DryRun to only print the commands without running them.
   Add -Models resnet18   to run just one model.
@@ -21,6 +21,9 @@ param(
     [switch]$DryRun
 )
 
+# When run via powershell -File, models like "resnet18,resnet50" arrive as one string;
+# normalise them to a list so each model is trained separately.
+$Models = @($Models | ForEach-Object { $_.Split([char]44) } | ForEach-Object { $_.Trim() })
 New-Item -ItemType Directory -Force -Path results | Out-Null
 $stamp = Get-Date -Format "yyyyMMdd_HHmm"
 $logfile = "results\run_all_tier${Tier}_$stamp.txt"
