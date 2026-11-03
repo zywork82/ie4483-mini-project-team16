@@ -87,6 +87,7 @@ cifar10/
   train_cifar10.py      CIFAR-10 baseline (small CNN, 10 classes)
   train_imbalance.py    CIFAR-10 class-imbalance experiments
   summarise_imbalance.py  mean ± std tables, per-class accuracy, confusion matrices
+  train_resnet_cifar.py   CIFAR-10 with pretrained ResNet-18 (frozen / fine-tuned)
 notebooks/              first versions, kept for reference only
 results/                experiment log, plots, submission.csv
 report/                 report drafts and figures
@@ -103,7 +104,7 @@ ResNet-50 pretrained on ImageNet, backbone frozen, new 2-output last layer,
 Adam, lr 0.001, batch 32, 5 epochs, no augmentation, all 20,000 training images.
 
 ```bash
-python src/train.py --model resnet50 --who P2 --epochs 5 --batch-size 32 --lr 0.001 --seed 42
+python src/train.py --model resnet50 --epochs 5 --batch-size 32 --lr 0.001 --seed 42
 ```
 
 Repeat with `--seed 43` and `--seed 44`. Augmentation is off by default in
@@ -171,7 +172,7 @@ Repeat with seeds 43 and 44. Drop `--no-augment` for the augmentation-on runs
 Matched comparison with ResNet-18 (2,000 train images, 500 val images):
 
 ```bash
-python src/train.py --who P3 --model small_cnn --subset 2000 --epochs 5 --seed 42
+python src/train.py --model small_cnn --subset 2000 --epochs 5 --seed 42
 ```
 
 Repeat with `--seed 1` and `--seed 2`.
@@ -209,15 +210,15 @@ The 21 runs take about 20 minutes on Apple MPS. `summarise_imbalance.py` writes
 `results/cifar_imbalance_table.csv`, `results/cifar_imbalance_perclass.csv`,
 `results/per_class_accuracy.png` and confusion matrix plots in `results/cm/png/`.
 
-### CIFAR-10 with pretrained ResNet-18 (question g)
+### 4.5 CIFAR-10 with pretrained ResNet-18 (question g)
 
 Uses ImageNet-pretrained ResNet-18 with images enlarged to 224 x 224.
 `frozen` trains only the new last layer; `finetune` trains the whole network.
 Each run appends one row to `results/resnet_cifar_summary.csv`.
 
-```
-python cifar10/train_resnet_cifar.py --mode frozen   --epochs 5 --seed 42
-python cifar10/train_resnet_cifar.py --mode finetune --epochs 5 --seed 42
+```bash
+python cifar10/train_resnet_cifar.py --mode frozen   --epochs 5 --seed 42 --data-dir notebooks/data
+python cifar10/train_resnet_cifar.py --mode finetune --epochs 5 --seed 42 --data-dir notebooks/data
 ```
 
 Repeat with `--seed 43` and `--seed 44` for the mean ± std reported in Table 17.
@@ -232,11 +233,12 @@ Add `--workers 0` if you run out of RAM on Windows.
 - Rerunning with the same seed on the same machine gave identical validation accuracy at every epoch.
 - Hardware and versions used for the final results:
 
-| Experiments                                  | Hardware                    | PyTorch                | Time                                         |
-| -------------------------------------------- | --------------------------- | ---------------------- | -------------------------------------------- |
-| ResNet-50 / ResNet-18 / VGG16 (Dogs vs Cats) | NVIDIA RTX 4060 (CUDA 12.6) | 2.14.1+cu126           | about 180 s per epoch (ResNet-50, full data) |
-| Small CNN (Dogs vs Cats)                     | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 230 s per epoch (full data)            |
-| CIFAR-10 and class imbalance                 | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 8–9 s per epoch                        |
+| Experiments                                  | Hardware                    | PyTorch                | Time                                             |
+| -------------------------------------------- | --------------------------- | ---------------------- | ------------------------------------------------ |
+| ResNet-50 / ResNet-18 / VGG16 (Dogs vs Cats) | NVIDIA RTX 4060 (CUDA 12.6) | 2.14.1+cu126           | about 180 s per epoch (ResNet-50, full data)     |
+| Small CNN (Dogs vs Cats)                     | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 230 s per epoch (full data)                |
+| CIFAR-10 and class imbalance                 | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 8–9 s per epoch                            |
+| ResNet-18 (CIFAR-10)                         | NVIDIA RTX 4060 (CUDA 12.6) | 2.14.1+cu126           | about 23 s per epoch (frozen), 54 s (fine-tuned) |
 
 - GPU and MPS training is not guaranteed to be fully deterministic, so small differences
   may appear on other hardware.
@@ -269,3 +271,10 @@ Rare = bird, cat, deer. Common = the other 7 classes.
 | Imbalanced, oversampling + augmentation       | 32,890       | 65.5 ± 0.7  | 47.9 ± 5.2 | 73.0 ± 2.9 | 65.0 ± 0.7 |
 | Imbalanced, oversampling only (check)         | 32,890       | 66.1 ± 0.5  | 36.1 ± 2.9 | 78.9 ± 0.8 | 64.5 ± 0.6 |
 | Imbalanced, augmentation only (check)         | 32,890       | 59.4 ± 1.2  | 5.1 ± 1.5  | 82.7 ± 1.1 | 52.5 ± 1.3 |
+
+**CIFAR-10 (test, 10,000 images, pretrained ResNet-18, images enlarged to 224 x 224, 5 epochs)**
+
+| Model                 | Trainable / total parameters | Test accuracy (%) |
+| --------------------- | ---------------------------- | ----------------- |
+| ResNet-18, frozen     | 5,130 / 11.2 M               | 86.5 ± 0.2        |
+| ResNet-18, fine-tuned | 11,181,642 / 11.2 M          | 94.5 ± 0.3        |
