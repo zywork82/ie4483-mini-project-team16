@@ -196,6 +196,7 @@ for bird, cat and deer. `--fix` picks the correction, `--aug` adds random crop
 ```bash
 for s in 42 43 44; do
   python -u cifar10/train_imbalance.py --imbalance none --fix none --seed $s
+  python -u cifar10/train_imbalance.py --imbalance none --fix none --epochs 15 --seed $s
   python -u cifar10/train_imbalance.py --imbalance none --fix none --aug --epochs 15 --seed $s
   python -u cifar10/train_imbalance.py --imbalance step --fix none --seed $s
   python -u cifar10/train_imbalance.py --imbalance step --fix weighted --seed $s
@@ -206,7 +207,7 @@ done
 python cifar10/summarise_imbalance.py
 ```
 
-The 21 runs take about 20 minutes on Apple MPS. `summarise_imbalance.py` writes
+The 24 runs take about 30 minutes on Apple MPS.`summarise_imbalance.py` writes
 `results/cifar_imbalance_table.csv`, `results/cifar_imbalance_perclass.csv`,
 `results/per_class_accuracy.png` and confusion matrix plots in `results/cm/png/`.
 
@@ -237,7 +238,7 @@ Add `--workers 0` if you run out of RAM on Windows.
 | -------------------------------------------- | --------------------------- | ---------------------- | ------------------------------------------------ |
 | ResNet-50 / ResNet-18 / VGG16 (Dogs vs Cats) | NVIDIA RTX 4060 (CUDA 12.6) | 2.14.1+cu126           | about 180 s per epoch (ResNet-50, full data)     |
 | Small CNN (Dogs vs Cats)                     | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 230 s per epoch (full data)                |
-| CIFAR-10 and class imbalance                 | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 8–9 s per epoch                            |
+| CIFAR-10 and class imbalance                 | Mac, Apple MPS              | 2.14.1 (Python 3.11.7) | about 14 s per epoch                             |
 | ResNet-18 (CIFAR-10)                         | NVIDIA RTX 4060 (CUDA 12.6) | 2.14.1+cu126           | about 23 s per epoch (frozen), 54 s (fine-tuned) |
 
 - GPU and MPS training is not guaranteed to be fully deterministic, so small differences
@@ -265,6 +266,7 @@ Rare = bird, cat, deer. Common = the other 7 classes.
 | Setup                                         | Train images | Overall (%) | Rare (%)   | Common (%) | Macro-F1   |
 | --------------------------------------------- | ------------ | ----------- | ---------- | ---------- | ---------- |
 | Balanced, 5 epochs (baseline)                 | 45,000       | 74.3 ± 0.8  | 58.8 ± 4.6 | 81.0 ± 0.9 | 74.0 ± 1.0 |
+| Balanced, 15 epochs, no augmentation          | 45,000       | 76.8 ± 0.9  | 67.0 ± 1.5 | 81.1 ± 0.6 | 76.8 ± 0.8 |
 | Balanced + augmentation, 15 epochs (improved) | 45,000       | 78.7 ± 0.9  | 67.5 ± 3.6 | 83.6 ± 1.5 | 78.6 ± 0.9 |
 | Imbalanced, no fix                            | 32,890       | 63.4 ± 0.2  | 13.4 ± 0.7 | 84.8 ± 0.1 | 57.9 ± 0.4 |
 | Imbalanced, weighted loss                     | 32,890       | 65.8 ± 0.8  | 45.3 ± 3.7 | 74.6 ± 2.2 | 65.3 ± 0.7 |
