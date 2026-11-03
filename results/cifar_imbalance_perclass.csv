@@ -1,0 +1,9 @@
+setup,airplane,automobile,bird,cat,deer,dog,frog,horse,ship,truck
+"(g) Baseline: balanced, 5 ep",82.2,87.4,63.6,47.6,65.2,69.9,83.3,80.7,83.1,80.4
+"(g) Check: balanced, 15 ep, no aug",77.8,87.9,69.3,58.1,73.5,67.7,82.1,80.6,88.9,82.5
+"(g) Improved: balanced + aug, 15 ep",82.8,89.1,69.4,58.9,74.2,69.4,84.2,82.0,89.1,88.3
+"(h) Imbalanced, no fix",86.6,88.9,20.3,3.9,16.0,79.4,88.8,86.0,82.3,81.5
+(h) Approach 1: weighted loss,75.4,80.5,49.6,37.7,48.8,58.2,73.2,75.7,80.2,78.9
+(h) Oversample only,77.1,84.7,34.6,24.3,49.4,71.0,83.3,80.3,78.7,77.5
+(h) Approach 2: oversample + aug,73.2,77.6,49.6,37.4,56.6,61.8,76.3,71.1,71.4,79.7
+(h) Aug only (ablation),84.3,86.3,11.3,0.1,3.8,86.6,89.7,73.0,79.0,79.9

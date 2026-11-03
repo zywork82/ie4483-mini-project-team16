@@ -25,6 +25,7 @@ SETUP_COLS = ["imbalance", "fix", "aug", "epochs"]
 # Readable names for the report, in the order they should appear
 LABELS = {
     ("none", "none", 0, 5): "(g) Baseline: balanced, 5 ep",
+    ("none", "none", 0, 15): "(g) Check: balanced, 15 ep, no aug",
     ("none", "none", 1, 15): "(g) Improved: balanced + aug, 15 ep",
     ("step", "none", 0, 5): "(h) Imbalanced, no fix",
     ("step", "weighted", 0, 5): "(h) Approach 1: weighted loss",
